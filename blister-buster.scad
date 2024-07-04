@@ -3,28 +3,35 @@
 // SPDX-License-Identifier: 0BSD
 
 // Blister-related parameters.
-// These are the ones you want to change to match your
-// blister configuration!
+// These are the ones you want to change to match your blister configuration!
+
+// These represent the size of the full blister, not just the part of it with the pills.
+// It's okay if the blister is not symmetric, as most of them would have lot information
+// on one of the sides.
 blister_length = 92.5;
 blister_width = 55;
 
-pill_diameter = 13;
+pill_diameter = 13.2;
 
-// How many pills lengthwise
+// How many pills in the two directions, and the outer length of the pills.
+// Refer to the blister-diagram image for a reference of which measures
+// to take!
 pills_rows = 5;
-// How many pills widthwise.
+pills_vertical_length = 85.95;
+
 pills_columns = 3;
+pills_horizontal_length = 50.5;
 
 // Only makes sense if rows and colums are odd!
 center_pill = false;
 
-// This assumes equal spacing between pills in rows and columns.
-pills_spacing = 3.5;
-
 // Design parameters.
 // Only change these if you want to experiment with the design,
 // or if somehow it doesn't work for you.
-plate_height = 2;
+
+stopper_plate_height = 2;     // Force is exerted on this.
+buster_plate_height = 2;      // And on this.
+alignment_plate_height = 0.8; // But not on this, this is alignment only.
 
 base_wall = 9;
 
@@ -34,23 +41,27 @@ alignment_pin_diameter = 4;
 alignment_pin_length = 30;
 
 // Post-processed parameters. Don't change these, they are formulaic.
+
 plate_length = blister_length + base_wall * 2;
 plate_width = blister_width + base_wall * 2;
 
 base_height = 
     alignment_pin_length
-    - buster_length - plate_height /* The buster itself */
-    - plate_height  /* The upper grid */
+    - buster_length - buster_plate_height /* The buster itself */
+    - alignment_plate_height              /* The upper grid */
     - 3 /* The blister spacing */
     ;
     
-plate_size = [plate_width, plate_length, plate_height];
-
+// Oversize the hole a bit to give it a bit more tollerance.
+pill_hole_side = pill_diameter * 1.1;
+    
 pills_col_middle = pills_columns % 2;
 pills_col_side = pills_columns / 2 - (pills_col_middle ? 0.5 : 0);
+pills_col_spacing = (pills_horizontal_length - (pills_columns * pill_diameter)) / (pills_columns - 1);
 
 pills_row_middle = pills_rows % 2;
 pills_row_side = pills_rows / 2 - (pills_row_middle ? 0.5 : 0);
+pills_row_spacing = (pills_vertical_length - (pills_rows * pill_diameter)) / (pills_rows - 1);
 
 horizontal_directions = pills_row_middle ? [-1, 0, 1] : [-1, 1];
 vertical_directions = pills_col_middle ? [-1, 0, 1] : [-1, 1];
@@ -62,7 +73,7 @@ function get_all_pills_coords() = [
         pill_column = [1:pills_col_side],
         vertical_direction = vertical_directions
     )
-        [pill_row * horizontal_direction, pill_column * vertical_direction]
+        [pill_column * vertical_direction, pill_row * horizontal_direction]
 ];
     
 function get_all_pills_coords_maybe_center() = [
@@ -72,21 +83,21 @@ function get_all_pills_coords_maybe_center() = [
 ];
 
     
-function get_pill_distance_odd(pill_idx) =
+function get_pill_distance_odd(pill_idx, pills_spacing) =
     pill_idx == 0 ? 0 :
         (pill_diameter + pills_spacing) * pill_idx;
 
-function get_pill_distance_even(pill_idx) =
+function get_pill_distance_even(pill_idx, pills_spacing) =
     pill_idx == 0 ? -11111111111111 :
         (pills_spacing /2 + pill_diameter / 2) +
         (pill_diameter + pills_spacing) * (pill_idx - 1);
     
 function get_pill_center(coords) = 
     [
-        pills_col_middle ? get_pill_distance_odd(coords[1]) :
-            get_pill_distance_even(coords[0]),
-        pills_row_middle ? get_pill_distance_odd(coords[0]) :
-            get_pill_distance_even(coords[1]),
+        pills_col_middle ? get_pill_distance_odd(coords[0], pills_col_spacing) :
+            get_pill_distance_even(coords[0], pills_col_spacing),
+        pills_row_middle ? get_pill_distance_odd(coords[1], pills_row_spacing) :
+            get_pill_distance_even(coords[1], pills_row_spacing),
     ];
 
 
@@ -103,7 +114,7 @@ top_grid_origin = [
 ];
 
 buster_origin = [
-    0, 0, base_height + 10 + plate_height + buster_length
+    0, 0, base_height + 4 + alignment_plate_height + buster_length
 ];
 
 // Add a 10% to account for tolerances.
@@ -136,17 +147,17 @@ translate (plate_origin_coordinates) {
                 cube([
                     plate_width - base_wall * 2,
                     plate_length - base_wall * 2,
-                    base_height - plate_height
+                    base_height - stopper_plate_height
                 ]);
             }
             
-            translate([0, 0, base_height - plate_height]) {
+            translate([0, 0, base_height - stopper_plate_height]) {
                 for (pill_idxs = get_all_pills_coords()) {
                     translate(
                         get_pill_center(pill_idxs) - plate_origin_coordinates
                     ) {
                         cube(
-                            [pill_diameter, pill_diameter, plate_height * 3],
+                            [pill_hole_side, pill_hole_side, stopper_plate_height * 3],
                             center=true
                         );
                     }
@@ -155,7 +166,7 @@ translate (plate_origin_coordinates) {
             
             // Carve holes for the alignment pins. They don't go
             // all the way to the bottom of the base!
-            translate([0, 0, plate_height]) {
+            translate([0, 0, stopper_plate_height]) {
                 for(pin=alignment_pins_coords) {
                     translate(pin - plate_origin_coordinates) {
                         cylinder(
@@ -174,9 +185,9 @@ translate (plate_origin_coordinates) {
         if (!center_pill) {
             translate(
                 -plate_origin_coordinates -
-                [pill_diameter/2, pill_diameter/2]
+                [pill_hole_side/2, pill_hole_side/2]
             ) {
-                cube([pill_diameter, pill_diameter, base_height]);
+                cube([pill_hole_side, pill_hole_side, base_height]);
             }
         }        
     }
@@ -187,11 +198,11 @@ translate (plate_origin_coordinates) {
 // Top Grid, center pill open even if present.
 translate(top_grid_origin) {
     difference() {
-        cube(plate_size, center=true);
+        cube([plate_width, plate_length, alignment_plate_height], center=true);
         
         for (pill_idxs = get_all_pills_coords()) {
             translate(get_pill_center(pill_idxs)) {
-                cube([pill_diameter, pill_diameter, 4], center=true);
+                cube([pill_hole_side, pill_hole_side, 4], center=true);
             }
         }
 
@@ -199,7 +210,7 @@ translate(top_grid_origin) {
         for(pin=alignment_pins_coords) {
             translate(pin) {
                 cylinder(
-                    plate_height * 1.1,
+                    alignment_plate_height * 1.1,
                     alignment_pin_hole_radius,
                     alignment_pin_hole_radius,
                     center=true,
@@ -215,8 +226,8 @@ translate(top_grid_origin) {
 translate(buster_origin) {
     difference() {
         union() {
-            translate([0, 0, buster_length + plate_height / 2]) {
-                cube(plate_size, center=true);
+            translate([0, 0, buster_length + buster_plate_height / 2]) {
+                cube([plate_width, plate_length, buster_plate_height], center=true);
             }
             
             for (pill_idxs = get_all_pills_coords_maybe_center()) {
@@ -237,7 +248,7 @@ translate(buster_origin) {
             for(pin=alignment_pins_coords) {
                 translate(pin + [0, 0, buster_length]) {
                     cylinder(
-                        plate_height * 1.1  ,
+                        buster_plate_height * 1.1  ,
                         alignment_pin_hole_radius,
                         alignment_pin_hole_radius,
                         $fn=720

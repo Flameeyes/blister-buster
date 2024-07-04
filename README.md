@@ -24,6 +24,40 @@ In addition to the printed components, you'll need two alignment pins.
 I use 4x30mm steel pins, but there's parameters to change this in the
 script itself.
 
+## Designing, Printing, and Using.
+
+### Parameters
+
+![Blister Diagram](images/blister-diagram.svg)
+
+You'll need to configure a few parameters in the `blister-buster.scad`
+file to fit your particular blister. You'll need to know:
+
+* the flat dimension of the blister ("length" and "width");
+* the diameter of a pill on the blister (not the pill itself, but
+  rather the pill's "pod");
+* the number of pills lengthwise (rows) and widthwise (columns);
+* only if both rows and columns are odd, whether there is a pill in
+  the center of the blister;
+* the total extension of the pills vertically and horizontally
+  as shown in the diagram above.
+
+### Printing
+
+I have printed all of my busters in PLA, 15% gyroid infill, 0.24mm layer.
+
+### How To Use
+
+1. Fit hte alignment pins on the base.
+2. Put the blister you want to pop on top of the base's grid, pills up.
+3. Fit the alignment plate on top, using the alignment pin holes as guide
+   (this should ensure that the pills in the blister are aligned with the
+   holes in the base's grid).
+4. Put the buster plate on top, with the domes matching the pills, use the
+   alignment pins to guide you.
+5. Press the buster plate onto the blister to pop all the pills in short
+   order.
+
 ## Why Is This?
 
 [I have diabetes](https://flameeyes.blog/tag/diabetes/), and for that
