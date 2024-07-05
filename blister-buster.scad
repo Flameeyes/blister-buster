@@ -8,19 +8,19 @@
 // These represent the size of the full blister, not just the part of it with the pills.
 // It's okay if the blister is not symmetric, as most of them would have lot information
 // on one of the sides.
-blister_length = 92.5;
-blister_width = 55;
+blister_length = 110;
+blister_width = 63.1;
 
-pill_diameter = 13.2;
+pill_diameter = 12.5;
 
 // How many pills in the two directions, and the outer length of the pills.
 // Refer to the blister-diagram image for a reference of which measures
 // to take!
 pills_rows = 5;
-pills_vertical_length = 85.95;
+pills_vertical_length = 93.5;
 
 pills_columns = 3;
-pills_horizontal_length = 50.5;
+pills_horizontal_length = 53.1;
 
 // Only makes sense if rows and colums are odd!
 center_pill = false;
@@ -53,7 +53,7 @@ base_height =
     ;
     
 // Oversize the hole a bit to give it a bit more tollerance.
-pill_hole_side = pill_diameter * 1.1;
+pill_hole_side = pill_diameter * 1.05;
     
 pills_col_middle = pills_columns % 2;
 pills_col_side = pills_columns / 2 - (pills_col_middle ? 0.5 : 0);

@@ -24,9 +24,9 @@ In addition to the printed components, you'll need two alignment pins.
 I use 4x30mm steel pins, but there's parameters to change this in the
 script itself.
 
-## Designing, Printing, and Using.
+## How To...
 
-### Parameters
+### Change Parameters
 
 ![Blister Diagram](images/blister-diagram.svg)
 
@@ -42,13 +42,22 @@ file to fit your particular blister. You'll need to know:
 * the total extension of the pills vertically and horizontally
   as shown in the diagram above.
 
-### Printing
+### 3D Print
 
-I have printed all of my busters in PLA, 15% gyroid infill, 0.24mm layer.
+I have printed all of my busters with an FDM printer, in PLA, 15% gyroid
+infill, 0.24mm layer.
 
-### How To Use
+The script generates a single STL files with three components, you should
+split them in different objects with your slicer.
 
-1. Fit hte alignment pins on the base.
+The alignment grid (the object in the middle) is intentionally very thin,
+so that it can be printed first to make sure the parameters are correct,
+before wasting material on incorrect builds. Do note that you may need to
+wait for your print to cool down before taking it off the plate.
+
+### Use
+
+1. Fit the alignment pins on the base.
 2. Put the blister you want to pop on top of the base's grid, pills up.
 3. Fit the alignment plate on top, using the alignment pin holes as guide
    (this should ensure that the pills in the blister are aligned with the
