@@ -143,11 +143,12 @@ translate (plate_origin_coordinates) {
                 cube([plate_width, plate_length, base_height]);
             }
             
-            translate([base_wall, base_wall]) {
+            // the 0.001 fudge is to avoid the artifact on the bottom during pre-render.
+            translate([base_wall, base_wall, -0.001 ]) {
                 cube([
                     plate_width - base_wall * 2,
                     plate_length - base_wall * 2,
-                    base_height - stopper_plate_height
+                    base_height - stopper_plate_height + 0.001
                 ]);
             }
             
@@ -244,7 +245,8 @@ translate(buster_origin) {
         }
 
         // Alignment Holes
-        translate([0, 0, buster_length]) {
+        // the 0.001 fudge is to avoid the artifact on the bottom during pre-render.
+        translate([0, 0, buster_length - 0.001]) {
             for(pin=alignment_pins_coords) {
                 translate(pin + [0, 0, buster_length]) {
                     cylinder(
